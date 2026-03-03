@@ -2,6 +2,9 @@
 
 RackOps is a straightforward, modern tool for managing your data center infrastructure. It gives you a clear visual for sites, racks, and hardware without the bloat of traditional DCIM software.
 
+![Login](screenshots/login.png)
+![Dashboard](screenshots/dashboard.png)
+
 ## 🚀 What's Inside
 
 - **Rack Elevations**: See exactly what's in your racks with front and back views.
