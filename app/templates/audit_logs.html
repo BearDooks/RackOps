@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Audit Logs - RackOps{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6 sm:px-0">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Audit Logs</h1>
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+            Showing latest system activity
+        </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg glass-panel">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700/50">
+                <tr>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Timestamp</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        User</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Action</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Resource</th>
+                    <th scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Details</th>
+                </tr>
+            </thead>
+            <tbody id="audit-logs-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <!-- Rows will be loaded here -->
+                <tr>
+                    <td colspan="5" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400 items-center">
+                        <div class="flex flex-col items-center justify-center gap-4">
+                            <div
+                                class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin">
+                            </div>
+                            <span>Fetching audit history...</span>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function fetchAuditLogs() {
+        const response = await apiFetch('/api/audit_logs/?limit=100');
+        if (!response || !response.ok) {
+            document.getElementById('audit-logs-body').innerHTML = `
+                <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-red-500">Failed to load audit logs.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        const logs = await response.json();
+        renderLogs(logs);
+    }
+
+    function renderLogs(logs) {
+        const body = document.getElementById('audit-logs-body');
+        if (logs.length === 0) {
+            body.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No audit logs found.</td></tr>';
+            return;
+        }
+
+        body.innerHTML = logs.map(log => {
+            let actionClass = '';
+            switch (log.action) {
+                case 'CREATE': actionClass = 'text-green-600 dark:text-green-400'; break;
+                case 'UPDATE': actionClass = 'text-blue-600 dark:text-blue-400'; break;
+                case 'DELETE': actionClass = 'text-red-600 dark:text-red-400'; break;
+                default: actionClass = 'text-gray-600';
+            }
+
+            const timestamp = new Date(log.timestamp).toLocaleString();
+            let details = '';
+            try {
+                const parsed = JSON.parse(log.details);
+                details = Object.entries(parsed).map(([k, v]) => `<span class="font-mono text-xs opacity-75">${k}: ${v}</span>`).join(', ');
+            } catch (e) {
+                details = log.details;
+            }
+
+            return `
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300 font-mono">${timestamp}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">${log.username}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold ${actionClass}">${log.action}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${log.resource_type} [${log.resource_id}]</td>
+                    <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate" title="${details.replace(/"/g, '&quot;')}">${details}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    fetchAuditLogs();
+</script>
+{% endblock %}

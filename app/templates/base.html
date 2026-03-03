@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RackOps{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='/favicon.png') }}">
+    <link href="{{ url_for('static', path='/css/output.css') }}" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+
+        .dark .glass {
+            background: rgba(17, 24, 39, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+
+        .dark .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+        }
+
+
+        .dark .glass-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.5);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7);
+        }
+
+        .skeleton {
+            background-image: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0,
+                    rgba(255, 255, 255, 0.2) 20%,
+                    rgba(255, 255, 255, 0.5) 60%,
+                    rgba(255, 255, 255, 0));
+            background-color: rgba(156, 163, 175, 0.2);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite linear;
+        }
+
+        .dark .skeleton {
+            background-image: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0,
+                    rgba(255, 255, 255, 0.05) 20%,
+                    rgba(255, 255, 255, 0.1) 60%,
+                    rgba(255, 255, 255, 0));
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .toast-enter {
+            animation: slideInRight 0.3s ease-out forwards;
+        }
+
+        .toast-leave {
+            animation: fadeOut 0.3s ease-out forwards;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+    </style>
+    <script>
+        // Dark mode toggle logic
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+
+        function toggleDarkMode() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark')
+                localStorage.theme = 'light'
+            } else {
+                document.documentElement.classList.add('dark')
+                localStorage.theme = 'dark'
+            }
+        }
+
+        // Authentication Guard
+        if (!localStorage.getItem('token') && window.location.pathname !== '/login') {
+            window.location.href = '/login';
+        }
+
+        // Global User State
+        let currentUser = null;
+        async function fetchMe() {
+            if (!localStorage.getItem('token')) return null;
+            try {
+                const response = await apiFetch('/api/me');
+                if (response && response.ok) {
+                    currentUser = await response.json();
+                    window.userRole = currentUser.role;
+                    document.dispatchEvent(new CustomEvent('userLoaded', { detail: currentUser }));
+                    updateUIPermissions();
+                }
+            } catch (e) {
+                console.error("Failed to fetch current user", e);
+            }
+        }
+
+        function updateUIPermissions() {
+            if (currentUser && currentUser.role === 'Admin') {
+                document.getElementById('nav-users-link').classList.remove('hidden');
+                document.getElementById('nav-audit-link').classList.remove('hidden');
+            }
+            if (currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Operator')) {
+                document.querySelectorAll('.operator-only').forEach(el => el.classList.remove('hidden'));
+            } else {
+                document.querySelectorAll('.operator-only').forEach(el => el.classList.add('hidden'));
+            }
+        }
+
+        fetchMe();
+
+        // Global API Fetch Wrapper
+
+        async function apiFetch(url, options = {}) {
+            const token = localStorage.getItem('token');
+            const defaultOptions = {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+
+            const mergedOptions = {
+                ...options,
+                headers: {
+                    ...defaultOptions.headers,
+                    ...(options.headers || {})
+                }
+            };
+
+            try {
+                const response = await fetch(url, mergedOptions);
+
+                if (response.status === 401) {
+                    console.warn("Unauthorized! Redirecting to login.");
+                    localStorage.removeItem('token');
+                    window.location.href = '/login';
+                    return null;
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+                    console.error(`API Error [${response.status}] ${url}:`, errorData);
+
+                    if (response.status === 403) {
+                        showToast(`Permission Denied: ${errorData.detail || 'Insufficient privileges'}`, 'error');
+                    } else if (response.status >= 500) {
+                        showToast("Server Error. Please check logs.", 'error');
+                    }
+                }
+
+                return response;
+            } catch (error) {
+                console.error(`Network Error ${url}:`, error);
+                showToast("Connection failed. Is the server running?", 'error');
+                return null;
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+    </script>
+
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen transition-colors duration-300">
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 glass shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-8">
+                    <a href="/" class="text-xl font-bold text-blue-600 dark:text-blue-400 flex-shrink-0">RackOps</a>
+                    <div class="hidden sm:flex gap-6 items-center">
+                        <a href="/"
+                            class="border-blue-500 text-gray-900 dark:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Dashboard</a>
+                        <a id="nav-users-link" href="/users"
+                            class="hidden text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium transition-colors">Users</a>
+                        <a id="nav-audit-link" href="/audit-logs"
+                            class="hidden text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium transition-colors">Audit
+                            Logs</a>
+                    </div>
+
+                </div>
+
+
+                <div class="flex items-center gap-4">
+                    <!-- Global Search Form -->
+                    <div class="relative hidden sm:block">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" id="global-search-input" placeholder="Search devices..." autocomplete="off"
+                            class="block w-full pl-10 pr-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm glass-input transition-all w-48 focus:w-64">
+                        <!-- Search Dropdown -->
+                        <div id="global-search-results"
+                            class="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md hidden max-h-96 overflow-y-auto">
+                        </div>
+                    </div>
+
+                    <button onclick="toggleDarkMode()"
+                        class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700/50 transition-colors focus:outline-none">
+                        <!-- Sun icon -->
+                        <svg class="w-6 h-6 hidden dark:block text-yellow-500" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        <!-- Moon icon -->
+                        <svg class="w-6 h-6 block dark:hidden text-gray-700" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <a href="/docs" title="API Documentation"
+                        class="text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 p-2 rounded-md text-sm font-mono transition-colors transition-transform hover:scale-110">&lt;/&gt;</a>
+
+                    <button onclick="handleLogout()" title="Logout"
+                        class="text-gray-400 hover:text-red-500 dark:hover:text-red-400 p-2 rounded-md text-sm transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            toast.className = `px-4 py-3 rounded shadow-lg text-white font-medium flex items-center justify-between gap-4 toast-enter min-w-[250px]`;
+
+            if (type === 'success') {
+                toast.classList.add('bg-green-600', 'dark:bg-green-700');
+            } else if (type === 'error') {
+                toast.classList.add('bg-red-600', 'dark:bg-red-700');
+            } else {
+                toast.classList.add('bg-blue-600', 'dark:bg-blue-700');
+            }
+
+            toast.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()" class="text-white hover:text-gray-200 focus:outline-none">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.remove('toast-enter');
+                    toast.classList.add('toast-leave');
+                    setTimeout(() => {
+                        if (toast.parentElement) toast.remove();
+                    }, 300);
+                }
+            }, 3000);
+        }
+
+        // Global Search Autocomplete Logic
+        const searchInput = document.getElementById('global-search-input');
+        const searchResults = document.getElementById('global-search-results');
+        let searchTimeout;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                clearTimeout(searchTimeout);
+
+                if (query.length < 2) {
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+
+                searchTimeout = setTimeout(async () => {
+                    try {
+                        const response = await apiFetch(`/api/devices/search?q=${encodeURIComponent(query)}`);
+                        if (response && response.ok) {
+                            const results = await response.json();
+                            renderSearchResults(results);
+                        }
+                    } catch (error) {
+                        console.error("Search error:", error);
+                    }
+                }, 300); // 300ms debounce
+
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.classList.add('hidden');
+                }
+            });
+
+            // Re-open if clicking back into input with text
+            searchInput.addEventListener('focus', () => {
+                if (searchInput.value.trim().length >= 2 && searchResults.innerHTML.trim() !== '') {
+                    searchResults.classList.remove('hidden');
+                }
+            });
+        }
+
+        function renderSearchResults(results) {
+            searchResults.innerHTML = '';
+
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="p-4 text-sm text-gray-500 dark:text-gray-400 text-center">No devices found</div>';
+            } else {
+                results.forEach(device => {
+                    const a = document.createElement('a');
+                    a.href = `/racks/${device.rack_id}`;
+                    a.className = 'block px-4 py-3 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors last:border-0';
+                    a.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <span class="font-bold text-gray-900 dark:text-white">${device.hostname}</span>
+                            <span class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 uppercase">${device.type || 'Server'}</span>
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            IP: ${device.ip_address || 'N/A'} &bull; SN: ${device.serial_number || 'N/A'}
+                        </div>
+                        <div class="text-xs text-blue-600 dark:text-blue-400 mt-1 font-medium">
+                            ${device.site_name} &bull; Rack ${device.rack_name} &bull; U${device.start_u}
+                        </div>
+                    `;
+                    searchResults.appendChild(a);
+                });
+            }
+            searchResults.classList.remove('hidden');
+        }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

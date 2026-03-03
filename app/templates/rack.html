@@ -1,0 +1,644 @@
+{% extends "base.html" %}
+
+{% block title %}Rack {{ rack_id }} - RackOps{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6 sm:px-0">
+    <nav class="mb-4 text-sm font-medium text-gray-500 dark:text-gray-400">
+        <a href="/" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Home</a>
+        <span class="mx-2">/</span>
+        <a id="breadcrumb-site-link" href="#"
+            class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Loading...</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900 dark:text-gray-100" id="breadcrumb-rack-name">Loading...</span>
+    </nav>
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 id="rack-title" class="text-3xl font-bold text-gray-900 dark:text-white">Rack Details</h1>
+            <p id="rack-desc" class="text-gray-600 dark:text-gray-300"></p>
+        </div>
+        <div>
+            <a href="#" id="back-site-btn" onclick="history.back()"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-900 border border-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white dark:border-gray-600 font-bold py-2 px-4 rounded shadow transition-all">
+                Back to Site
+            </a>
+
+        </div>
+    </div>
+
+    <div class="flex justify-center gap-8 w-full max-w-6xl mx-auto">
+        <!-- Rack Front Container -->
+        <div
+            class="w-1/2 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-2xl p-4 glass-panel border border-gray-300 dark:border-gray-700">
+            <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-200 mb-4">Front</h2>
+            <div id="rack-elevation-front"
+                class="flex flex-col gap-1 w-full bg-gray-900/5 dark:bg-black/20 p-2 rounded relative">
+                <!-- Slots will be rendered here by JS -->
+            </div>
+        </div>
+
+        <!-- Rack Back Container -->
+        <div
+            class="w-1/2 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-2xl p-4 glass-panel border border-gray-300 dark:border-gray-700">
+            <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-200 mb-4">Back</h2>
+            <div id="rack-elevation-back"
+                class="flex flex-col gap-1 w-full bg-gray-900/5 dark:bg-black/20 p-2 rounded relative">
+                <!-- Slots will be rendered here by JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Device Modal -->
+<div id="deviceModal" class="fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog"
+    aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"
+            onclick="closeModal()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div
+            class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full glass-panel">
+            <form id="deviceForm" onsubmit="handleDeviceSubmit(event)">
+                <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4" id="modal-title">Manage
+                        Device</h3>
+                    <input type="hidden" id="device-id">
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hostname</label>
+                            <input type="text" id="dev-hostname" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Make</label>
+                            <input type="text" id="dev-make"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Model</label>
+                            <input type="text" id="dev-model"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start U</label>
+                            <input type="number" id="dev-start-u" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End U</label>
+                            <input type="number" id="dev-end-u" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Serial
+                                Number</label>
+                            <input type="text" id="dev-serial"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">IP Address</label>
+                            <input type="text" id="dev-ip"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Owner</label>
+                            <input type="text" id="dev-owner"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">OOB IP
+                                Address</label>
+                            <input type="text" id="dev-oob-ip"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Operating
+                                System</label>
+                            <input type="text" id="dev-os"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Asset Tag</label>
+                            <input type="text" id="dev-asset-tag"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
+                        </div>
+
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
+                            <textarea id="dev-notes" rows="3"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2 bg-transparent"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Device
+                                Type</label>
+                            <select id="dev-type"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2 bg-transparent text-gray-900 dark:text-white">
+                                <option value="Server" class="text-gray-900">Server</option>
+                                <option value="Network" class="text-gray-900">Network</option>
+                                <option value="Storage" class="text-gray-900">Storage</option>
+                                <option value="Patch Panel" class="text-gray-900">Patch Panel</option>
+                                <option value="PDU" class="text-gray-900">PDU</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Depth</label>
+                            <select id="dev-depth" onchange="handleDepthChange()"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2 bg-transparent">
+                                <option value="full" class="text-gray-900">Full Depth</option>
+                                <option value="half" class="text-gray-900">Half Depth</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Position</label>
+                            <select id="dev-position" disabled
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2 bg-transparent disabled:opacity-50">
+                                <option value="both" class="text-gray-900">Both (Full Depth)</option>
+                                <option value="front" class="text-gray-900">Front</option>
+                                <option value="back" class="text-gray-900">Back</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="submit" id="btn-save"
+                        class="operator-only hidden w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Save
+                    </button>
+                    <button type="button" id="btn-delete" onclick="deleteDevice()"
+                        class="operator-only hidden w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Delete
+                    </button>
+
+                    <button type="button" onclick="closeModal()"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const rackId = "{{ rack_id }}";
+    let currentRack = null;
+    let rackDevices = [];
+
+    async function fetchRackData() {
+        const [rackRes, devicesRes] = await Promise.all([
+            apiFetch(`/api/racks/${rackId}`),
+            apiFetch(`/api/racks/${rackId}/devices`)
+        ]);
+
+        if (!rackRes || !devicesRes) return;
+
+
+        const currentRackData = await rackRes.json();
+        rackDevices = await devicesRes.json();
+
+        const siteRes = await apiFetch(`/api/sites/${currentRackData.site_id}`);
+        const siteData = siteRes ? await siteRes.json() : { name: 'Error' };
+
+
+        document.getElementById('rack-title').textContent = `Rack ${currentRackData.row}-${currentRackData.number}`;
+        document.getElementById('breadcrumb-rack-name').textContent = `Rack ${currentRackData.row}-${currentRackData.number}`;
+
+        document.getElementById('breadcrumb-site-link').textContent = siteData.name;
+        document.getElementById('breadcrumb-site-link').href = `/sites/${siteData.id}`;
+        document.getElementById('back-site-btn').href = `/sites/${siteData.id}`;
+
+        // override onclick so it uses the href properly
+        document.getElementById('back-site-btn').onclick = null;
+
+        document.getElementById('rack-desc').textContent = `${siteData.name} | Site ID: ${currentRackData.site_id} | ${currentRackData.total_units} Units`;
+
+        currentRack = currentRackData; // set global
+
+
+        renderRack();
+    }
+
+    function handleDepthChange() {
+        const depthSelect = document.getElementById('dev-depth');
+        const posSelect = document.getElementById('dev-position');
+        if (depthSelect.value === 'full') {
+            posSelect.value = 'both';
+            posSelect.disabled = true;
+        } else {
+            posSelect.disabled = false;
+            if (posSelect.value === 'both') {
+                posSelect.value = 'front';
+            }
+        }
+    }
+
+    function renderRack() {
+        const frontContainer = document.getElementById('rack-elevation-front');
+        const backContainer = document.getElementById('rack-elevation-back');
+        frontContainer.innerHTML = '';
+        backContainer.innerHTML = '';
+
+        // Create maps of occupied units
+        const occupiedFront = new Map(); // U -> device or 'blocked'
+        const occupiedBack = new Map(); // U -> device or 'blocked'
+
+        rackDevices.forEach(d => {
+            for (let u = d.start_u; u <= d.end_u; u++) {
+                if (d.position === 'front' || d.position === 'both') {
+                    if (!occupiedFront.has(u) || occupiedFront.get(u) === 'blocked') {
+                        occupiedFront.set(u, d);
+                    }
+                    if (d.depth === 'full' && (d.position === 'front' || d.position === 'both')) {
+                        occupiedBack.set(u, 'blocked');
+                    }
+                }
+                if (d.position === 'back' || d.position === 'both') {
+                    if (!occupiedBack.has(u) || occupiedBack.get(u) === 'blocked') {
+                        occupiedBack.set(u, d);
+                    }
+                    if (d.depth === 'full' && (d.position === 'back' || d.position === 'both')) {
+                        occupiedFront.set(u, 'blocked');
+                    }
+                }
+            }
+        });
+
+        window.occupiedFrontMap = occupiedFront;
+        window.occupiedBackMap = occupiedBack;
+
+        // Helper to render slots
+        function renderColumn(container, occupiedMap, isFront) {
+            for (let u = currentRack.total_units; u >= 1; u--) {
+                const device = occupiedMap.get(u);
+
+                // If this U is occupied
+                if (device) {
+                    if (device === 'blocked') {
+                        // Check if the other side has a half-rack device that doesn't block this side
+                        // Actually 'blocked' means it IS blocked by a full-depth device.
+                        // If it's half-depth, it shouldn't be 'blocked' in the map.
+
+                        // Render blocked slot
+                        const slotEl = document.createElement('div');
+                        slotEl.style.height = '2.5rem';
+                        slotEl.className = `w-full bg-gray-300/30 dark:bg-gray-800/50 border border-gray-300/50 dark:border-gray-600/30 rounded flex items-center px-4 opacity-50 cursor-not-allowed`;
+
+                        const uNumSpan = document.createElement('span');
+                        uNumSpan.className = 'text-xs text-gray-500 dark:text-gray-400 w-6';
+                        uNumSpan.textContent = u;
+
+                        const labelSpan = document.createElement('span');
+                        labelSpan.className = 'text-sm text-gray-400 dark:text-gray-500 ml-2';
+                        labelSpan.textContent = 'Blocked (Full Depth Device)';
+
+                        slotEl.appendChild(uNumSpan);
+                        slotEl.appendChild(labelSpan);
+                        container.appendChild(slotEl);
+
+                    } else if (u === device.end_u) {
+                        // If this is the TOP unit of the device, render the device block
+                        const heightUnits = device.end_u - device.start_u + 1;
+                        const heightRem = (heightUnits * 2.5) + ((heightUnits - 1) * 0.25); // 0.25rem gap
+
+                        const deviceEl = document.createElement('div');
+                        deviceEl.style.height = `${heightRem}rem`;
+
+                        let bgColor = '';
+                        let typeIcon = '';
+                        const devType = device.type || 'Server';
+
+                        switch (devType) {
+                            case 'Network':
+                                bgColor = 'bg-purple-500/30 dark:bg-purple-600/40 border-purple-400/50 hover:bg-purple-500/50';
+                                typeIcon = '<svg class="w-4 h-4 mr-2 text-purple-600 dark:text-purple-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>';
+                                break;
+                            case 'Storage':
+                                bgColor = 'bg-orange-500/30 dark:bg-orange-600/40 border-orange-400/50 hover:bg-orange-500/50';
+                                typeIcon = '<svg class="w-4 h-4 mr-2 text-orange-600 dark:text-orange-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>';
+                                break;
+                            case 'Patch Panel':
+                                bgColor = 'bg-gray-500/30 dark:bg-gray-600/40 border-gray-400/50 hover:bg-gray-500/50';
+                                typeIcon = '<svg class="w-4 h-4 mr-2 text-gray-600 dark:text-gray-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>';
+                                break;
+                            case 'PDU':
+                                bgColor = 'bg-yellow-500/30 dark:bg-yellow-600/40 border-yellow-400/50 hover:bg-yellow-500/50';
+                                typeIcon = '<svg class="w-4 h-4 mr-2 text-yellow-600 dark:text-yellow-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>';
+                                break;
+                            default: // Server
+                                bgColor = 'bg-blue-500/30 dark:bg-blue-600/40 border-blue-400/50 hover:bg-blue-500/50';
+                                typeIcon = '<svg class="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>';
+                                break;
+                        }
+
+
+                        if (device.depth === 'half') {
+                            bgColor = bgColor.replace('500/30', '400/10').replace('600/40', '500/10');
+                        }
+
+                        deviceEl.className = `w-full backdrop-blur-md border rounded flex flex-col justify-center px-4 transition-colors relative group ${bgColor}`;
+
+                        // All users can click occupied slots to view details
+                        deviceEl.classList.add('cursor-pointer');
+                        deviceEl.onclick = () => openModal(device);
+
+
+                        const topRow = document.createElement('div');
+                        topRow.className = 'flex justify-between items-center';
+
+                        const hostnameSpan = document.createElement('span');
+                        hostnameSpan.className = 'font-bold text-gray-900 dark:text-white truncate flex items-center';
+                        hostnameSpan.innerHTML = typeIcon + device.hostname;
+
+                        const modelSpan = document.createElement('span');
+                        modelSpan.className = 'text-xs text-gray-700 dark:text-gray-300 bg-white/20 px-2 py-0.5 rounded mr-2';
+                        modelSpan.textContent = `${device.make} ${device.model}`;
+
+                        const depthPill = document.createElement('span');
+                        depthPill.className = 'text-xs px-2 py-0.5 rounded font-medium ' +
+                            (device.depth === 'full' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200');
+                        depthPill.textContent = device.depth === 'full' ? 'Full Depth' : (device.position === 'front' ? 'Half (Front)' : 'Half (Back)');
+
+                        const rightDiv = document.createElement('div');
+                        rightDiv.className = 'flex items-center';
+                        rightDiv.appendChild(modelSpan);
+                        rightDiv.appendChild(depthPill);
+
+                        topRow.appendChild(hostnameSpan);
+                        topRow.appendChild(rightDiv);
+
+                        const bottomRow = document.createElement('div');
+                        bottomRow.className = 'flex justify-between items-center text-xs text-gray-800 dark:text-gray-200 mt-1';
+
+                        const ipSpan = document.createElement('span');
+                        ipSpan.textContent = device.ip_address || 'No IP';
+
+                        const uSpan = document.createElement('span');
+                        uSpan.textContent = `U${device.start_u}-${device.end_u}`;
+
+                        bottomRow.appendChild(ipSpan);
+                        bottomRow.appendChild(uSpan);
+
+                        deviceEl.appendChild(topRow);
+                        deviceEl.appendChild(bottomRow);
+                        // Moved onclick logic up to handle permissions
+                        container.appendChild(deviceEl);
+
+                    }
+                    // If it's a middle or bottom unit, do nothing (it's covered by the top block)
+                } else {
+                    // Empty Slot
+                    const slotEl = document.createElement('div');
+                    slotEl.style.height = '2.5rem';
+                    slotEl.className = `w-full bg-white/40 dark:bg-gray-700/30 border border-gray-300/50 dark:border-gray-600/30 rounded flex items-center px-4 transition-colors group`;
+
+                    if (currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Operator')) {
+                        slotEl.classList.add('cursor-pointer', 'hover:bg-green-100/50', 'dark:hover:bg-green-900/30');
+                        slotEl.onclick = () => handleSlotClick(u, isFront ? 'front' : 'back');
+                    } else {
+                        slotEl.classList.add('cursor-default');
+                    }
+
+
+                    const uNumSpan = document.createElement('span');
+                    uNumSpan.className = 'text-xs text-gray-500 dark:text-gray-400 w-6';
+                    uNumSpan.textContent = u;
+
+                    const labelSpan = document.createElement('span');
+                    labelSpan.className = 'text-sm text-gray-400 dark:text-gray-500 group-hover:text-green-600 dark:group-hover:text-green-400 ml-2 transition-colors';
+                    labelSpan.textContent = 'Empty Slot';
+
+                    if (selectionStartU === u && selectionPosition === (isFront ? 'front' : 'back')) {
+                        slotEl.classList.remove('bg-white/40', 'dark:bg-gray-700/30', 'hover:bg-green-100/50', 'dark:hover:bg-green-900/30');
+                        slotEl.classList.add('bg-blue-200/50', 'dark:bg-blue-800/50', 'border-blue-400');
+                        labelSpan.textContent = 'Selected (Start)';
+                        labelSpan.classList.add('text-blue-600', 'dark:text-blue-400', 'font-bold');
+                    }
+
+                    slotEl.appendChild(uNumSpan);
+                    slotEl.appendChild(labelSpan);
+
+                    // Moved onclick logic up to handle permissions
+                    container.appendChild(slotEl);
+
+                }
+            }
+        }
+
+        renderColumn(frontContainer, occupiedFront, true);
+        renderColumn(backContainer, occupiedBack, false);
+        if (typeof updateUIPermissions === 'function') updateUIPermissions();
+    }
+
+
+    let selectionStartU = null;
+    let selectionPosition = null;
+
+    function handleSlotClick(u, positionStr) {
+        if (!selectionStartU) {
+            selectionStartU = u;
+            selectionPosition = positionStr;
+            showToast(`Selected U${u}. Click another slot to select the end of the range, or click again to add a 1U device.`, 'info');
+            renderRack();
+        } else {
+            let start = Math.min(selectionStartU, u);
+            let end = Math.max(selectionStartU, u);
+
+            if (positionStr !== selectionPosition) {
+                showToast("Cannot select across front and back. Selection reset.", "error");
+                selectionStartU = null;
+                renderRack();
+                return;
+            }
+
+            let isBlocked = false;
+            let occMap = positionStr === 'front' ? window.occupiedFrontMap : window.occupiedBackMap;
+            for (let i = start; i <= end; i++) {
+                const dev = occMap.get(i);
+                if (dev && dev !== 'blocked') isBlocked = true;
+                if (dev === 'blocked') isBlocked = true; // Still can't place if blocked by full-depth
+            }
+
+            if (isBlocked) {
+                showToast("Selection contains occupied or blocked slots. Selection reset.", "error");
+                selectionStartU = null;
+                renderRack();
+                return;
+            }
+
+            let startU = start;
+            let endU = end;
+            selectionStartU = null;
+            selectionPosition = null;
+            openModal(null, { startU, endU, position: positionStr });
+            renderRack(); // reset highlights
+        }
+    }
+    function openModal(device, selection = null) {
+        const modal = document.getElementById('deviceModal');
+        const form = document.getElementById('deviceForm');
+
+        const depthSelect = document.getElementById('dev-depth');
+        const posSelect = document.getElementById('dev-position');
+
+        const isReadOnly = currentUser && currentUser.role === 'Viewer';
+
+        if (device) {
+            // Edit or View Mode
+            document.getElementById('modal-title').textContent = isReadOnly ? "Device Details" : "Edit Device";
+            document.getElementById('device-id').value = device.id;
+            document.getElementById('dev-hostname').value = device.hostname;
+            document.getElementById('dev-make').value = device.make;
+            document.getElementById('dev-model').value = device.model;
+            document.getElementById('dev-serial').value = device.serial_number;
+            document.getElementById('dev-ip').value = device.ip_address;
+            document.getElementById('dev-owner').value = device.owner;
+            document.getElementById('dev-start-u').value = device.start_u;
+            document.getElementById('dev-end-u').value = device.end_u;
+            document.getElementById('dev-type').value = device.type || 'Server';
+
+            document.getElementById('dev-notes').value = device.notes || '';
+            document.getElementById('dev-oob-ip').value = device.oob_ip || '';
+            document.getElementById('dev-os').value = device.os || '';
+            document.getElementById('dev-asset-tag').value = device.asset_tag || '';
+
+            depthSelect.value = device.depth || 'full';
+            posSelect.value = device.position || 'both';
+
+            // Show delete button only for operators/admins in edit mode
+            document.getElementById('btn-delete').classList.toggle('hidden', isReadOnly || !device.id);
+
+            // Handle Read-Only State
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.id !== 'device-id') {
+                    input.disabled = isReadOnly;
+                    // Add subtle styling for disabled fields
+                    if (isReadOnly) {
+                        input.classList.add('opacity-75', 'bg-gray-100', 'dark:bg-gray-700/50');
+                    } else {
+                        input.classList.remove('opacity-75', 'bg-gray-100', 'dark:bg-gray-700/50');
+                    }
+                }
+            });
+
+            // Hide save button for viewers
+            document.getElementById('btn-save').classList.toggle('hidden', isReadOnly);
+
+        } else {
+            // Create Mode (Operators/Admins only)
+            document.getElementById('modal-title').textContent = "Add Device";
+            document.getElementById('device-id').value = '';
+            form.reset();
+
+            // Ensure inputs are enabled for creation
+            form.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = false;
+                input.classList.remove('opacity-75', 'bg-gray-100', 'dark:bg-gray-700/50');
+            });
+
+            document.getElementById('dev-start-u').value = selection ? selection.startU : 1;
+            document.getElementById('dev-end-u').value = selection ? selection.endU : 1;
+            document.getElementById('dev-type').value = 'Server';
+
+            depthSelect.value = 'full';
+            posSelect.value = selection ? selection.position : 'both';
+
+            document.getElementById('btn-delete').classList.add('hidden');
+            document.getElementById('btn-save').classList.remove('hidden');
+        }
+
+        handleDepthChange();
+
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('deviceModal').classList.add('hidden');
+    }
+
+    async function handleDeviceSubmit(e) {
+        e.preventDefault();
+
+        const deviceId = document.getElementById('device-id').value;
+        const data = {
+            hostname: document.getElementById('dev-hostname').value,
+            make: document.getElementById('dev-make').value,
+            model: document.getElementById('dev-model').value,
+            serial_number: document.getElementById('dev-serial').value,
+            ip_address: document.getElementById('dev-ip').value,
+            owner: document.getElementById('dev-owner').value,
+            rack_id: rackId,
+            start_u: parseInt(document.getElementById('dev-start-u').value),
+            end_u: parseInt(document.getElementById('dev-end-u').value),
+            depth: document.getElementById('dev-depth').value,
+            position: document.getElementById('dev-position').value,
+            type: document.getElementById('dev-type').value,
+            notes: document.getElementById('dev-notes').value,
+            oob_ip: document.getElementById('dev-oob-ip').value,
+            os: document.getElementById('dev-os').value,
+            asset_tag: document.getElementById('dev-asset-tag').value
+        };
+
+        let response;
+        try {
+            if (deviceId) {
+                // Use PUT for update
+                response = await apiFetch(`/api/devices/${deviceId}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(data)
+                });
+            } else {
+                response = await apiFetch('/api/devices/', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+            }
+
+
+            if (response && response.ok) {
+                closeModal();
+                fetchRackData();
+                showToast(deviceId ? 'Device updated successfully' : 'Device created successfully', 'success');
+            } else {
+                const err = await response.json();
+                showToast('Error: ' + (err.detail || 'Failed to save device'), 'error');
+            }
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+        }
+    }
+
+    async function deleteDevice() {
+        const deviceId = document.getElementById('device-id').value;
+        if (!confirm('Are you sure you want to delete this device?')) return;
+
+        const response = await apiFetch(`/api/devices/${deviceId}`, { method: 'DELETE' });
+
+        if (response.ok) {
+            closeModal();
+            fetchRackData();
+            showToast('Device deleted successfully', 'success');
+        } else {
+            showToast('Failed to delete device', 'error');
+        }
+    }
+
+    fetchRackData();
+</script>
+{% endblock %}

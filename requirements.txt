@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+sqlalchemy
+jinja2
+python-multipart
+aiofiles
+passlib
+bcrypt==4.0.1
+python-jose[cryptography]
+fastapi-azure-auth
+alembic
+psycopg2-binary
+python-dotenv
+

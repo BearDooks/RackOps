@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - RackOps{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6 sm:px-0">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Search Results</h1>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Showing devices matching: <span
+                class="font-semibold text-blue-600 dark:text-blue-400">"{{ query }}"</span></p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden glass-panel">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700/50">
+                    <tr>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Hostname</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            IP Address</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Make / Model</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Serial Number</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Owner</th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Location</th>
+                    </tr>
+                </thead>
+                <tbody id="search-results-tbody" class="bg-transparent divide-y divide-gray-200 dark:divide-gray-700">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="no-results-message" class="hidden p-8 text-center text-gray-500 dark:text-gray-400">
+            <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+            </svg>
+            <p class="text-lg font-medium">No devices found matching your query.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function performSearch() {
+        // Query param from the Jinja context
+        const query = "{{ query }}";
+        if (!query) return;
+
+        try {
+            const response = await fetch(`/api/devices/search?q=${encodeURIComponent(query)}`);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const devices = await response.json();
+
+            const tbody = document.getElementById('search-results-tbody');
+            const noResults = document.getElementById('no-results-message');
+
+            tbody.innerHTML = '';
+
+            if (devices.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+
+                devices.forEach(device => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer";
+                    // Click the row to jump to the rack page
+                    tr.onclick = () => { window.location.href = `/racks/${device.rack_id}`; };
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                            ${device.hostname}
+                            <span class="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">${device.type || 'Server'}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                            ${device.ip_address || '-'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                            ${device.make || '-'} ${device.model || '-'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                            ${device.serial_number || '-'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                            ${device.owner || '-'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                            <a href="/sites/${device.site_id}" class="text-blue-500 hover:underline hover:text-blue-600" onclick="event.stopPropagation()">${device.site_name}</a> &bull; Rack ${device.rack_name} (U${device.start_u}-U${device.end_u})
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+            document.getElementById('no-results-message').classList.remove('hidden');
+            document.getElementById('no-results-message').innerHTML = '<p class="text-red-500">Error loading search results.</p>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', performSearch);
+</script>
+{% endblock %}
