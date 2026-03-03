@@ -264,17 +264,17 @@
                     if (!occupiedFront.has(u) || occupiedFront.get(u) === 'blocked') {
                         occupiedFront.set(u, d);
                     }
-                    if (d.depth === 'full' && (d.position === 'front' || d.position === 'both')) {
-                        occupiedBack.set(u, 'blocked');
-                    }
                 }
                 if (d.position === 'back' || d.position === 'both') {
                     if (!occupiedBack.has(u) || occupiedBack.get(u) === 'blocked') {
                         occupiedBack.set(u, d);
                     }
-                    if (d.depth === 'full' && (d.position === 'back' || d.position === 'both')) {
-                        occupiedFront.set(u, 'blocked');
-                    }
+                }
+
+                // Block the opposite side only if it's full depth and strictly in one position
+                if (d.depth === 'full') {
+                    if (d.position === 'front') occupiedBack.set(u, 'blocked');
+                    if (d.position === 'back') occupiedFront.set(u, 'blocked');
                 }
             }
         });
