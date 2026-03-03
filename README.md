@@ -4,6 +4,7 @@ RackOps is a straightforward, modern tool for managing your data center infrastr
 
 ![Login](screenshots/login.png)
 ![Dashboard](screenshots/dashboard.png)
+![Rackview](screenshots/rack.png)
 
 ## 🚀 What's Inside
 
