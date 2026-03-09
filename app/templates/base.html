@@ -6,7 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}RackOps{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', path='/favicon.png') }}">
-    <link href="{{ url_for('static', path='/css/output.css') }}" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {}
+            }
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .glass {
@@ -210,7 +218,7 @@
                 }
 
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ detail: "Unknown error" }));
+                    const errorData = await response.clone().json().catch(() => ({ detail: "Unknown error" }));
                     console.error(`API Error [${response.status}] ${url}:`, errorData);
 
                     if (response.status === 403) {
@@ -251,6 +259,8 @@
                         <a id="nav-audit-link" href="/audit-logs"
                             class="hidden text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium transition-colors">Audit
                             Logs</a>
+                        <a id="nav-settings-link" href="/settings"
+                            class="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium transition-colors">Settings</a>
                     </div>
 
                 </div>
@@ -266,7 +276,12 @@
                             </svg>
                         </div>
                         <input type="text" id="global-search-input" placeholder="Search devices..." autocomplete="off"
-                            class="block w-full pl-10 pr-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm glass-input transition-all w-48 focus:w-64">
+                            class="block w-full pl-10 pr-12 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm glass-input transition-all w-48 focus:w-64">
+                        <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                            <span
+                                class="hidden sm:inline-flex items-center justify-center px-1.5 py-0.5 border border-gray-300 dark:border-gray-600 rounded text-xs font-sans font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">Ctrl
+                                K</span>
+                        </div>
                         <!-- Search Dropdown -->
                         <div id="global-search-results"
                             class="absolute z-50 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md hidden max-h-96 overflow-y-auto">
@@ -357,6 +372,14 @@
         let searchTimeout;
 
         if (searchInput) {
+            // Keyboard shortcut Ctrl+K
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.trim();
                 clearTimeout(searchTimeout);
@@ -421,6 +444,26 @@
                 });
             }
             searchResults.classList.remove('hidden');
+        }
+
+        // Global Copy to Clipboard Helper
+        async function copyToClipboard(text, element) {
+            try {
+                await navigator.clipboard.writeText(text);
+                if (element) {
+                    const originalHTML = element.innerHTML;
+                    element.innerHTML = `<svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+                    element.classList.add('text-green-500');
+                    setTimeout(() => {
+                        element.innerHTML = originalHTML;
+                        element.classList.remove('text-green-500');
+                    }, 2000);
+                }
+                showToast("Copied to clipboard!", "success");
+            } catch (err) {
+                console.error("Failed to copy:", err);
+                showToast("Failed to copy to clipboard", "error");
+            }
         }
     </script>
     {% block scripts %}{% endblock %}

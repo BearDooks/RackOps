@@ -96,9 +96,13 @@ class UserBase(BaseModel):
     username: str = Field(..., max_length=255)
     role: str = Field("Viewer", max_length=20)
     is_active: Optional[bool] = True
+    tooltips_enabled: Optional[bool] = True
 
 class UserCreate(UserBase):
     password: str = Field(..., max_length=255)
+
+class UserPreferencesUpdate(BaseModel):
+    tooltips_enabled: Optional[bool] = None
 
 class User(UserBase):
     id: int

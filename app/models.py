@@ -59,6 +59,7 @@ class User(Base):
     hashed_password = Column(String)
     role = Column(String, default="Viewer") # "Viewer" or "Editor"
     is_active = Column(Boolean, default=True)
+    tooltips_enabled = Column(Boolean, default=True)
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"

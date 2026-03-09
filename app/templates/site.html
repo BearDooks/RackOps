@@ -318,6 +318,7 @@
 
         const url = editingRackId ? `/api/racks/${editingRackId}` : '/api/racks/';
         const method = editingRackId ? 'PUT' : 'POST';
+        const successMsg = editingRackId ? 'Rack updated successfully' : 'Rack created successfully';
 
         const response = await apiFetch(url, {
             method: method,
@@ -328,7 +329,10 @@
         if (response && response.ok) {
             closeRackModal();
             fetchRacks();
-            showToast(editingRackId ? 'Rack updated successfully' : 'Rack created successfully', 'success');
+            showToast(successMsg, 'success');
+        } else if (response) {
+            const errorData = await response.json().catch(() => ({ detail: "Failed to save rack." }));
+            showToast(errorData.detail || 'Failed to save rack', 'error');
         } else {
             showToast('Failed to save rack', 'error');
         }
