@@ -29,7 +29,7 @@
     <div class="flex justify-center gap-8 w-full max-w-6xl mx-auto">
         <!-- Rack Front Container -->
         <div
-            class="w-1/2 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-2xl p-4 glass-panel border border-gray-300 dark:border-gray-700">
+            class="w-1/2 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-2xl p-4 glass-panel border border-gray-300 dark:border-gray-700 hover:z-50">
             <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-200 mb-4">Front</h2>
             <div id="rack-elevation-front"
                 class="flex flex-col gap-1 w-full bg-gray-900/5 dark:bg-black/20 p-2 rounded relative">
@@ -39,7 +39,7 @@
 
         <!-- Rack Back Container -->
         <div
-            class="w-1/2 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-2xl p-4 glass-panel border border-gray-300 dark:border-gray-700">
+            class="w-1/2 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-2xl p-4 glass-panel border border-gray-300 dark:border-gray-700 hover:z-50">
             <h2 class="text-xl font-bold text-center text-gray-800 dark:text-gray-200 mb-4">Back</h2>
             <div id="rack-elevation-back"
                 class="flex flex-col gap-1 w-full bg-gray-900/5 dark:bg-black/20 p-2 rounded relative">
@@ -57,94 +57,25 @@
             onclick="closeModal()"></div>
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
         <div
-            class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full glass-panel">
+            class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl w-full glass-panel">
             <form id="deviceForm" onsubmit="handleDeviceSubmit(event)">
                 <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4" id="modal-title">Manage
                         Device</h3>
                     <input type="hidden" id="device-id">
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-y-3 gap-x-4">
+                        <div class="md:col-span-2 lg:col-span-1">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hostname</label>
                             <input type="text" id="dev-hostname" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Make</label>
-                            <input type="text" id="dev-make"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Model</label>
-                            <input type="text" id="dev-model"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start U</label>
-                            <input type="number" id="dev-start-u" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End U</label>
-                            <input type="number" id="dev-end-u" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Serial
-                                Number</label>
-                            <input type="text" id="dev-serial"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">IP Address</label>
-                            <input type="text" id="dev-ip"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Owner</label>
-                            <input type="text" id="dev-owner"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">OOB IP
-                                Address</label>
-                            <input type="text" id="dev-oob-ip"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Operating
-                                System</label>
-                            <input type="text" id="dev-os"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Asset Tag</label>
-                            <input type="text" id="dev-asset-tag"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2">
-                        </div>
-
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
-                            <textarea id="dev-notes" rows="3"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2 bg-transparent"></textarea>
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
                         </div>
 
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Device
                                 Type</label>
                             <select id="dev-type"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2 bg-transparent text-gray-900 dark:text-white">
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm bg-transparent text-gray-900 dark:text-white">
                                 <option value="Server" class="text-gray-900">Server</option>
                                 <option value="Network" class="text-gray-900">Network</option>
                                 <option value="Storage" class="text-gray-900">Storage</option>
@@ -154,26 +85,138 @@
                         </div>
 
                         <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Owner</label>
+                            <input type="text" id="dev-owner"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Make</label>
+                            <input type="text" id="dev-make"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Model</label>
+                            <input type="text" id="dev-model"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
+                        </div>
+
+                        <div>
+                            <label class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <span>Serial Number</span>
+                                <button type="button" class="text-gray-400 hover:text-blue-500 transition-colors"
+                                    onclick="copyToClipboard(document.getElementById('dev-serial').value, this)"
+                                    title="Copy Serial Number">
+                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </label>
+                            <input type="text" id="dev-serial"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Start U</label>
+                            <input type="number" id="dev-start-u" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">End U</label>
+                            <input type="number" id="dev-end-u" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
+                        </div>
+
+                        <div>
+                            <label class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <span>IP Address</span>
+                                <button type="button" class="text-gray-400 hover:text-blue-500 transition-colors"
+                                    onclick="copyToClipboard(document.getElementById('dev-ip').value, this)"
+                                    title="Copy IP">
+                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </label>
+                            <input type="text" id="dev-ip"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
+                        </div>
+
+                        <div>
+                            <label class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <span>Asset Tag</span>
+                                <button type="button" class="text-gray-400 hover:text-blue-500 transition-colors"
+                                    onclick="copyToClipboard(document.getElementById('dev-asset-tag').value, this)"
+                                    title="Copy Asset Tag">
+                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </label>
+                            <input type="text" id="dev-asset-tag"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Operating
+                                System</label>
+                            <input type="text" id="dev-os"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
+                        </div>
+
+                        <div>
+                            <label class="flex justify-between text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <span>OOB IP Address</span>
+                                <button type="button" class="text-gray-400 hover:text-blue-500 transition-colors"
+                                    onclick="copyToClipboard(document.getElementById('dev-oob-ip').value, this)"
+                                    title="Copy OOB IP">
+                                    <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </label>
+                            <input type="text" id="dev-oob-ip"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm">
+                        </div>
+
+                        <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Depth</label>
                             <select id="dev-depth" onchange="handleDepthChange()"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2 bg-transparent">
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm bg-transparent">
                                 <option value="full" class="text-gray-900">Full Depth</option>
                                 <option value="half" class="text-gray-900">Half Depth</option>
                             </select>
                         </div>
 
-                        <div>
+                        <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Position</label>
                             <select id="dev-position" disabled
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2 bg-transparent disabled:opacity-50">
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-1.5 text-sm bg-transparent disabled:opacity-50">
                                 <option value="both" class="text-gray-900">Both (Full Depth)</option>
                                 <option value="front" class="text-gray-900">Front</option>
                                 <option value="back" class="text-gray-900">Back</option>
                             </select>
                         </div>
+
+                        <div class="md:col-span-3">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes</label>
+                            <textarea id="dev-notes" rows="2"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 glass-input dark:text-white p-2 text-sm bg-transparent"></textarea>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <div
+                    class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse sm:items-center">
                     <button type="submit" id="btn-save"
                         class="operator-only hidden w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
                         Save
@@ -187,10 +230,24 @@
                         class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500">
                         Cancel
                     </button>
+                    <div class="mt-3 sm:mt-0 sm:mr-auto flex items-center operator-only hidden"
+                        id="add-another-container">
+                        <input id="add-another-checkbox" type="checkbox"
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600">
+                        <label for="add-another-checkbox" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                            Keep open to add another
+                        </label>
+                    </div>
                 </div>
-            </form>
+
+                <button type="button" onclick="closeModal()"
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm dark:bg-gray-600 dark:text-gray-200 dark:border-gray-500 dark:hover:bg-gray-500">
+                    Cancel
+                </button>
         </div>
+        </form>
     </div>
+</div>
 </div>
 {% endblock %}
 
@@ -325,23 +382,23 @@
 
                         switch (devType) {
                             case 'Network':
-                                bgColor = 'bg-purple-500/30 dark:bg-purple-600/40 border-purple-400/50 hover:bg-purple-500/50';
+                                bgColor = 'bg-purple-500/30 dark:bg-purple-600/40 border-purple-400/50 hover:bg-purple-500/50 border-l-4 border-l-purple-500 dark:border-l-purple-400';
                                 typeIcon = '<svg class="w-4 h-4 mr-2 text-purple-600 dark:text-purple-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>';
                                 break;
                             case 'Storage':
-                                bgColor = 'bg-orange-500/30 dark:bg-orange-600/40 border-orange-400/50 hover:bg-orange-500/50';
+                                bgColor = 'bg-orange-500/30 dark:bg-orange-600/40 border-orange-400/50 hover:bg-orange-500/50 border-l-4 border-l-orange-500 dark:border-l-orange-400';
                                 typeIcon = '<svg class="w-4 h-4 mr-2 text-orange-600 dark:text-orange-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>';
                                 break;
                             case 'Patch Panel':
-                                bgColor = 'bg-gray-500/30 dark:bg-gray-600/40 border-gray-400/50 hover:bg-gray-500/50';
+                                bgColor = 'bg-gray-500/30 dark:bg-gray-600/40 border-gray-400/50 hover:bg-gray-500/50 border-l-4 border-l-gray-500 dark:border-l-gray-400';
                                 typeIcon = '<svg class="w-4 h-4 mr-2 text-gray-600 dark:text-gray-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>';
                                 break;
                             case 'PDU':
-                                bgColor = 'bg-yellow-500/30 dark:bg-yellow-600/40 border-yellow-400/50 hover:bg-yellow-500/50';
+                                bgColor = 'bg-yellow-500/30 dark:bg-yellow-600/40 border-yellow-400/50 hover:bg-yellow-500/50 border-l-4 border-l-yellow-500 dark:border-l-yellow-400';
                                 typeIcon = '<svg class="w-4 h-4 mr-2 text-yellow-600 dark:text-yellow-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>';
                                 break;
                             default: // Server
-                                bgColor = 'bg-blue-500/30 dark:bg-blue-600/40 border-blue-400/50 hover:bg-blue-500/50';
+                                bgColor = 'bg-blue-500/30 dark:bg-blue-600/40 border-blue-400/50 hover:bg-blue-500/50 border-l-4 border-l-blue-500 dark:border-l-blue-400';
                                 typeIcon = '<svg class="w-4 h-4 mr-2 text-blue-600 dark:text-blue-400 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>';
                                 break;
                         }
@@ -351,7 +408,7 @@
                             bgColor = bgColor.replace('500/30', '400/10').replace('600/40', '500/10');
                         }
 
-                        deviceEl.className = `w-full backdrop-blur-md border rounded flex flex-col justify-center px-4 transition-colors relative group ${bgColor}`;
+                        deviceEl.className = `w-full backdrop-blur-md border rounded flex flex-col justify-center px-4 transition-colors relative group hover:z-50 ${bgColor}`;
 
                         // All users can click occupied slots to view details
                         deviceEl.classList.add('cursor-pointer');
@@ -396,6 +453,38 @@
 
                         deviceEl.appendChild(topRow);
                         deviceEl.appendChild(bottomRow);
+
+                        // Tooltip Element (conditional based on user preference)
+                        if (!currentUser || currentUser.tooltips_enabled !== false) {
+                            const tooltip = document.createElement('div');
+                            const tooltipSideClassees = isFront ? 'left-full ml-4' : 'right-full mr-4';
+                            tooltip.className = `hidden group-hover:block absolute z-50 ${tooltipSideClassees} top-1/2 -translate-y-1/2 bg-gray-900/95 dark:bg-gray-800/95 backdrop-blur-md text-white p-3 rounded shadow-xl border border-gray-700 w-64 text-sm pointer-events-none`;
+
+                            tooltip.innerHTML = `
+                                <div class="font-bold mb-2 pb-2 border-b border-gray-700/50 text-blue-100 flex items-center justify-between">
+                                    <span class="truncate">${device.hostname}</span>
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between items-center"><span class="text-gray-400 text-xs uppercase">IP Address</span> <span class="font-mono text-xs font-semibold">${device.ip_address || 'N/A'}</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-gray-400 text-xs uppercase">OOB IP</span> <span class="font-mono text-xs font-semibold">${device.oob_ip || 'N/A'}</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-gray-400 text-xs uppercase">Asset Tag</span> <span class="font-semibold">${device.asset_tag || 'N/A'}</span></div>
+                                    <div class="flex justify-between items-center"><span class="text-gray-400 text-xs uppercase">OS</span> <span class="font-semibold text-xs truncate max-w-[120px] text-right" title="${device.os}">${device.os || 'N/A'}</span></div>
+                                </div>
+                            `;
+                            deviceEl.appendChild(tooltip);
+                        }
+
+                        // Drag and Drop (Operators only)
+                        if (currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Operator')) {
+                            deviceEl.setAttribute('draggable', 'true');
+                            deviceEl.ondragstart = (e) => {
+                                e.dataTransfer.setData('application/json', JSON.stringify(device));
+                                e.dataTransfer.effectAllowed = 'move';
+                                setTimeout(() => deviceEl.classList.add('opacity-50'), 0);
+                            };
+                            deviceEl.ondragend = () => deviceEl.classList.remove('opacity-50');
+                        }
+
                         // Moved onclick logic up to handle permissions
                         container.appendChild(deviceEl);
 
@@ -410,6 +499,17 @@
                     if (currentUser && (currentUser.role === 'Admin' || currentUser.role === 'Operator')) {
                         slotEl.classList.add('cursor-pointer', 'hover:bg-green-100/50', 'dark:hover:bg-green-900/30');
                         slotEl.onclick = () => handleSlotClick(u, isFront ? 'front' : 'back');
+
+                        // Drag Drop target
+                        slotEl.ondragover = (e) => {
+                            e.preventDefault();
+                            e.dataTransfer.dropEffect = 'move';
+                            slotEl.classList.add('bg-blue-100/50', 'dark:bg-blue-900/30', 'border-blue-500');
+                        };
+                        slotEl.ondragleave = (e) => {
+                            slotEl.classList.remove('bg-blue-100/50', 'dark:bg-blue-900/30', 'border-blue-500');
+                        };
+                        slotEl.ondrop = (e) => handleDeviceDrop(e, u, isFront ? 'front' : 'back');
                     } else {
                         slotEl.classList.add('cursor-default');
                     }
@@ -489,6 +589,70 @@
             renderRack(); // reset highlights
         }
     }
+    async function handleDeviceDrop(e, targetU, targetPosition) {
+        e.preventDefault();
+        const slotEl = e.currentTarget;
+        slotEl.classList.remove('bg-blue-100/50', 'dark:bg-blue-900/30', 'border-blue-500');
+
+        try {
+            const deviceData = e.dataTransfer.getData('application/json');
+            if (!deviceData) return;
+            const device = JSON.parse(deviceData);
+
+            const height = device.end_u - device.start_u + 1;
+            let newStartU = targetU;
+            let newEndU = targetU + height - 1;
+
+            if (newEndU > currentRack.total_units) {
+                showToast("Not enough space to move device here.", "error");
+                return;
+            }
+
+            let isBlocked = false;
+            let targetMap = targetPosition === 'front' ? window.occupiedFrontMap : window.occupiedBackMap;
+
+            for (let i = newStartU; i <= newEndU; i++) {
+                const occupant = targetMap.get(i);
+                if (occupant && (occupant === 'blocked' || occupant.id !== device.id)) {
+                    isBlocked = true;
+                }
+                if (device.depth === 'full') {
+                    const oppMap = targetPosition === 'front' ? window.occupiedBackMap : window.occupiedFrontMap;
+                    const oppOccupant = oppMap.get(i);
+                    if (oppOccupant && (oppOccupant === 'blocked' || oppOccupant.id !== device.id)) {
+                        isBlocked = true;
+                    }
+                }
+            }
+
+            if (isBlocked) {
+                showToast("Cannot move device here. Slots are occupied.", "error");
+                return;
+            }
+
+            device.start_u = newStartU;
+            device.end_u = newEndU;
+            if (device.depth === 'half') {
+                device.position = targetPosition;
+            }
+
+            const res = await apiFetch(`/api/devices/${device.id}`, {
+                method: 'PUT',
+                body: JSON.stringify(device)
+            });
+
+            if (res && res.ok) {
+                fetchRackData();
+                showToast("Device moved successfully", "success");
+            } else {
+                const err = await res.json();
+                showToast("Failed to move: " + (err.detail || 'Overlap detected'), "error");
+            }
+        } catch (err) {
+            console.error("Drop error", err);
+        }
+    }
+
     function openModal(device, selection = null) {
         const modal = document.getElementById('deviceModal');
         const form = document.getElementById('deviceForm');
@@ -522,6 +686,7 @@
 
             // Show delete button only for operators/admins in edit mode
             document.getElementById('btn-delete').classList.toggle('hidden', isReadOnly || !device.id);
+            document.getElementById('add-another-container').classList.add('hidden');
 
             // Handle Read-Only State
             const inputs = form.querySelectorAll('input, select, textarea');
@@ -561,6 +726,7 @@
 
             document.getElementById('btn-delete').classList.add('hidden');
             document.getElementById('btn-save').classList.remove('hidden');
+            document.getElementById('add-another-container').classList.remove('hidden');
         }
 
         handleDepthChange();
@@ -612,9 +778,31 @@
 
 
             if (response && response.ok) {
-                closeModal();
+                const addAnother = document.getElementById('add-another-checkbox').checked && !deviceId;
                 fetchRackData();
                 showToast(deviceId ? 'Device updated successfully' : 'Device created successfully', 'success');
+
+                if (addAnother) {
+                    const nextStartU = data.end_u + 1;
+                    const nextEndU = nextStartU + (data.end_u - data.start_u);
+
+                    document.getElementById('dev-hostname').value = '';
+                    document.getElementById('dev-serial').value = '';
+                    document.getElementById('dev-ip').value = '';
+                    document.getElementById('dev-oob-ip').value = '';
+                    document.getElementById('dev-asset-tag').value = '';
+
+                    if (nextEndU <= currentRack.total_units) {
+                        document.getElementById('dev-start-u').value = nextStartU;
+                        document.getElementById('dev-end-u').value = nextEndU;
+                    } else {
+                        document.getElementById('dev-start-u').value = 1;
+                        document.getElementById('dev-end-u').value = 1;
+                    }
+                    setTimeout(() => document.getElementById('dev-hostname').focus(), 100);
+                } else {
+                    closeModal();
+                }
             } else {
                 const err = await response.json();
                 showToast('Error: ' + (err.detail || 'Failed to save device'), 'error');

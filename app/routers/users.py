@@ -27,6 +27,18 @@ def create_user(
         raise HTTPException(status_code=400, detail="Username already registered")
     return crud.create_user(db=db, user=user)
 
+@router.put("/me/preferences", response_model=schemas.User)
+def update_my_preferences(
+    prefs: schemas.UserPreferencesUpdate,
+    db: Session = Depends(database.get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    if prefs.tooltips_enabled is not None:
+        current_user.tooltips_enabled = prefs.tooltips_enabled
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
 @router.put("/{user_id}", response_model=schemas.User)
 def update_user(
     user_id: int,

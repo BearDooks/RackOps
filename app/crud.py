@@ -98,6 +98,13 @@ def update_rack(db: Session, rack_id: int, rack: schemas.RackCreate, username: s
     if existing:
         raise HTTPException(status_code=400, detail=f"Rack '{rack.row}-{rack.number}' already exists in this site.")
 
+    if hasattr(rack, 'total_units') and rack.total_units is not None:
+        max_device_u = 0
+        if db_rack.devices:
+            max_device_u = max(device.end_u for device in db_rack.devices)
+        if rack.total_units < max_device_u:
+            raise HTTPException(status_code=400, detail=f"Cannot shrink rack to {rack.total_units}U. There is a device occupying U{max_device_u}.")
+
     update_data = rack.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(db_rack, key, value)
@@ -213,8 +220,11 @@ def search_devices(db: Session, query: str):
         .filter(
             (models.Device.hostname.ilike(search_pattern)) |
             (models.Device.serial_number.ilike(search_pattern)) |
+            (models.Device.asset_tag.ilike(search_pattern)) |
             (models.Device.ip_address.ilike(search_pattern)) |
-            (models.Device.owner.ilike(search_pattern))
+            (models.Device.oob_ip.ilike(search_pattern)) |
+            (models.Device.owner.ilike(search_pattern)) |
+            (models.Device.notes.ilike(search_pattern))
         ).limit(10).all()
         
     response = []

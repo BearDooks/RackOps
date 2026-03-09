@@ -21,6 +21,10 @@ async def audit_logs_page(request: Request):
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+@router.get("/settings", response_class=HTMLResponse)
+async def settings_page(request: Request):
+    return templates.TemplateResponse("settings.html", {"request": request})
+
 @router.get("/sites/{site_id}", response_class=HTMLResponse)
 async def view_site(request: Request, site_id: int):
     return templates.TemplateResponse("site.html", {"request": request, "site_id": site_id})
